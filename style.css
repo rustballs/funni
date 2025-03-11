@@ -5,16 +5,24 @@ body {
     align-items: center;
     height: 100vh;
     background-color: black;
+    overflow: hidden;
 }
 
 #container {
     position: relative;
-    width: 800px;
-    height: 600px;
-    border: 2px solid white;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #dvd, #jumpscare {
     position: absolute;
     width: 100px;
+}
+
+#jumpscare {
+    width: 100%;
+    height: 100%;
 }
