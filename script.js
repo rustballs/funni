@@ -43,13 +43,7 @@ class DVDLogo {
 
     cornerAction() {
         this.cornerSound.play();
-        const originalSrc = this.img.src;
-        this.img.src = 'new_image.png'; // Replace with the path to the new image
-
-        setTimeout(() => {
-            this.img.src = originalSrc;
-            new DVDLogo(this.container, originalSrc, this.bounceSound, this.cornerSound);
-        }, 2000);
+        new DVDLogo(this.container, this.img.src, this.bounceSound, this.cornerSound);
     }
 }
 
