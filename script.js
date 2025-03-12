@@ -1,85 +1,60 @@
-const container = document.getElementById("container");
-const bounceSound = document.getElementById("bounceSound");
-const jumpscareSound = document.getElementById("jumpscareSound");
-let dvds = [];
+class DVDLogo {
+    constructor(container, src, bounceSound, cornerSound) {
+        this.container = container;
+        this.img = document.createElement('img');
+        this.img.src = src;
+        this.img.className = 'dvd-logo';
+        this.container.appendChild(this.img);
+        this.bounceSound = bounceSound;
+        this.cornerSound = cornerSound;
 
-function createDVD(x, y) {
-    const dvd = document.createElement("img");
-    dvd.src = "dvd_logo.png";
-    dvd.classList.add("dvd");
-    dvd.style.left = x + "px";
-    dvd.style.top = y + "px";
+        this.x = Math.random() * (window.innerWidth - this.img.clientWidth);
+        this.y = Math.random() * (window.innerHeight - this.img.clientHeight);
+        this.dx = 2;
+        this.dy = 2;
 
-    const jumpscare = document.createElement("img");
-    jumpscare.src = "jumpscare_image.png";
-    jumpscare.classList.add("jumpscare");
-    jumpscare.style.display = "none";
+        this.updatePosition();
+    }
 
-    container.appendChild(dvd);
-    container.appendChild(jumpscare);
+    updatePosition() {
+        this.x += this.dx;
+        this.y += this.dy;
 
-    let dx = Math.random() * 4 - 2;
-    let dy = Math.random() * 4 - 2;
-
-    dvds.push({ dvd, jumpscare, dx, dy });
-}
-
-function updatePositions() {
-    dvds.forEach(dvdObj => {
-        let { dvd, jumpscare, dx, dy } = dvdObj;
-        let x = dvd.offsetLeft + dx;
-        let y = dvd.offsetTop + dy;
-
-        if (x <= 0 || x >= window.innerWidth - dvd.clientWidth) {
-            dx = -dx;
-            playBounceSound();
-            checkJumpScare(dvd, jumpscare, x, y);
-        }
-        if (y <= 0 || y >= window.innerHeight - dvd.clientHeight) {
-            dy = -dy;
-            playBounceSound();
-            checkJumpScare(dvd, jumpscare, x, y);
+        if (this.x <= 0 || this.x >= window.innerWidth - this.img.clientWidth) {
+            this.dx = -this.dx;
+            this.bounceSound.play();
+            if (this.x <= 0 || this.x >= window.innerWidth - this.img.clientWidth) {
+                this.cornerAction();
+            }
         }
 
-        dvd.style.left = x + "px";
-        dvd.style.top = y + "px";
+        if (this.y <= 0 || this.y >= window.innerHeight - this.img.clientHeight) {
+            this.dy = -this.dy;
+            this.bounceSound.play();
+            if (this.y <= 0 || this.y >= window.innerHeight - this.img.clientHeight) {
+                this.cornerAction();
+            }
+        }
 
-        dvdObj.dx = dx;
-        dvdObj.dy = dy;
-    });
-}
+        this.img.style.left = `${this.x}px`;
+        this.img.style.top = `${this.y}px`;
+        requestAnimationFrame(this.updatePosition.bind(this));
+    }
 
-function playBounceSound() {
-    bounceSound.play();
-}
+    cornerAction() {
+        this.cornerSound.play();
+        const originalSrc = this.img.src;
+        this.img.src = 'new_image.png'; // Replace with the path to the new image
 
-function checkJumpScare(dvd, jumpscare, x, y) {
-    if ((x <= 0 || x >= window.innerWidth - dvd.clientWidth) &&
-        (y <= 0 || y >= window.innerHeight - dvd.clientHeight)) {
-        dvd.style.display = "none";
-        jumpscare.style.display = "block";
-        jumpscareSound.play();
         setTimeout(() => {
-            jumpscare.style.display = "none";
-            dvd.style.display = "block";
-        }, 1000);
+            this.img.src = originalSrc;
+            new DVDLogo(this.container, originalSrc, this.bounceSound, this.cornerSound);
+        }, 2000);
     }
 }
 
-function spawnDVDs(count) {
-    for (let i = 0; i < count; i++) {
-        const x = Math.random() * (window.innerWidth - 100);
-        const y = Math.random() * (window.innerHeight - 100);
-        createDVD(x, y);
-    }
-}
+const container = document.getElementById('dvd-container');
+const bounceSound = document.getElementById('bounce-sound');
+const cornerSound = document.getElementById('corner-sound');
 
-window.addEventListener("keydown", (e) => {
-    if (e.code === "Space") {
-        const currentCount = dvds.length;
-        spawnDVDs(currentCount);
-    }
-});
-
-spawnDVDs(1);
-setInterval(updatePositions, 10);
+new DVDLogo(container, 'dvd_logo.png', bounceSound, cornerSound);
